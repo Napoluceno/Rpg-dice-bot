@@ -88,3 +88,4 @@ client.on('messageCreate', message => {
 // Substitua 'SEU_TOKEN_AQUI' pelo token do seu bot
 client.login(process.env.TOKEN);
 
+
