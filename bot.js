@@ -86,4 +86,5 @@ client.on('messageCreate', message => {
 });
 
 // Substitua 'SEU_TOKEN_AQUI' pelo token do seu bot
-client.login('MTQ2NjgzNDYzMjEwMzI5NzI3Nw.GCmJt0.N8DmhQyoshxg7SCR2k6UNOznByRpf6CFxkJVw4');
+client.login(process.env.TOKEN);
+
