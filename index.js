@@ -1,5 +1,4 @@
 // Carrega variável de ambiente
-require('dotenv').config();
 
 const { Client, GatewayIntentBits } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
