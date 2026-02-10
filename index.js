@@ -15,30 +15,47 @@ const frasesD20 = {
     "Sukuna ri em algum lugar distante.",
     "Isso foi patético até para uma maldição fraca.",
     "O azar te abraça com força.",
-    "Você falha de forma vergonhosa."
+    "Você falha de forma vergonhosa.",
+    "A técnica implode antes de se formar.",
+    "Você sente a maldição te rejeitar."
   ],
   falha: [
     "Nada explode, mas também não impressiona.",
     "Você tentou. Isso conta… mais ou menos.",
     "O resultado foi decepcionante.",
     "Sua técnica sai torta.",
-    "Passou longe do ideal."
+    "Passou longe do ideal.",
+    "Faltou controle de energia.",
+    "A execução foi fraca."
   ],
   sucesso: [
     "Funcionou. Nada lendário, mas sólido.",
     "Você executa bem o suficiente.",
     "A energia flui sem resistência.",
     "Nada espetacular, mas eficiente.",
-    "Você manda bem."
+    "Você manda bem.",
+    "Um uso correto da técnica.",
+    "A maldição reage como esperado."
   ],
   critSucesso: [
     "Você é um maldito abençoado.",
     "A realidade pisca. Você venceu.",
     "Isso foi absurdo de bom.",
     "Até Sukuna respeita esse resultado.",
-    "Você dobra o destino com facilidade."
+    "Você dobra o destino com facilidade.",
+    "O fluxo amaldiçoado te obedece.",
+    "Isso entra para a história."
   ]
 };
+
+// ===================== ITENS LENDÁRIOS =====================
+const itensLendarios = [
+  "🩸 **Dedo de Sukuna** — Poder colossal, mas extremamente corruptor.",
+  "🧠 **Fragmento do Conhecimento de Kenjaku** — Técnicas roubadas e segredos proibidos.",
+  "🗡️ **Lança Invertida do Céu** — Anula técnicas amaldiçoadas ao contato.",
+  "📿 **Objeto Amaldiçoado de Grau Especial** — Instável, poderoso e imprevisível.",
+  "👁️ **Relíquia de Tengen** — Afeta barreiras e as regras do mundo."
+];
 
 // ===================== UTILIDADES =====================
 function rand(max) {
@@ -81,9 +98,9 @@ function fraseD20(roll) {
 const commands = [
   new SlashCommandBuilder()
     .setName('rolar')
-    .setDescription('Rola dados no formato XdY+Z ou XdY-Z')
+    .setDescription('Rola dados no formato XdY+Z+Z')
     .addStringOption(o =>
-      o.setName('dados').setDescription('Ex: 1d20-3').setRequired(true)
+      o.setName('dados').setDescription('Ex: 1d20+3+3').setRequired(true)
     ),
 
   new SlashCommandBuilder()
@@ -130,38 +147,39 @@ client.on('interactionCreate', async interaction => {
   // -------- ROLAR / VIDA / CARISMA / VONTADE --------
   if (['rolar', 'vida', 'carisma', 'vontade'].includes(interaction.commandName)) {
     const input = interaction.options.getString('dados');
-    const match = /^(\d+)d(\d+)([+-]\d+)?$/i.exec(input);
 
-    if (!match) {
+    const diceMatch = /^(\d+)d(\d+)/i.exec(input);
+    if (!diceMatch) {
       return interaction.reply({ content: 'Formato inválido.', ephemeral: true });
     }
 
-    let [, qtd, faces, mod] = match;
-    qtd = parseInt(qtd);
-    faces = parseInt(faces);
-    const modifier = mod ? parseInt(mod) : 0;
+    let qtd = parseInt(diceMatch[1]);
+    let faces = parseInt(diceMatch[2]);
 
     if (faces > 1000) {
       return interaction.reply({ content: 'Máximo de 1000 faces.', ephemeral: true });
     }
 
+    const mods = input.match(/[+-]\d+/g) || [];
+    const modifier = mods.reduce((acc, m) => acc + parseInt(m), 0);
+
     let rolls = [];
     let soma = 0;
 
     for (let i = 0; i < qtd; i++) {
-      rolls.push(rand(faces));
-      soma += rolls[i];
+      const r = rand(faces);
+      rolls.push(r);
+      soma += r;
     }
 
     let raw = (qtd === 1 && faces === 20) ? rolls[0] : null;
-
     if (raw !== null) raw = aplicarPity(userId, raw, modifier);
 
     const total = (raw !== null ? raw : soma) + modifier;
 
     let resposta =
       `**TOTAL: ${total}**\n` +
-      `${qtd}d${faces} (${rolls.join(', ')}) ${modifier >= 0 ? '+' : '-'} ${Math.abs(modifier)} = ${total}`;
+      `${qtd}d${faces} (${rolls.join(', ')}) ${mods.join(' ')} = ${total}`;
 
     if (raw !== null) resposta += `\n_${fraseD20(raw)}_`;
 
@@ -182,7 +200,7 @@ client.on('interactionCreate', async interaction => {
     const total = roll + modifier;
 
     let recompensa;
-    if (roll >= 19) recompensa = "🔥 ITEM LENDÁRIO — algo que muda o jogo.";
+    if (roll >= 19) recompensa = `🔥 ITEM LENDÁRIO — ${escolher(itensLendarios)}`;
     else if (roll >= 11) recompensa = "✨ Item raro amaldiçoado.";
     else recompensa = "📦 Item comum ou moedas.";
 
