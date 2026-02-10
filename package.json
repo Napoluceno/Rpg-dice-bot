@@ -1,16 +1,14 @@
 {
   "name": "rpg-dice-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Bot de RPG de dados estilo Jujutsu Kaisen",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
-    "discord.js": "^14.25.1"
+    "discord.js": "^14.25.1",
+    "dotenv": "^16.4.5"
   }
 }
